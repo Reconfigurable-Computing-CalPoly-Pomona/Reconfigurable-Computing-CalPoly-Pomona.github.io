@@ -10,7 +10,7 @@
     .question-title { font-weight: bold; }
     .options { margin-left: 20px; }
     .btn { padding: 10px 16px; background: #0055a4; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; }
-    .score { font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+    .score { font-size: 1.2em; font-weight: bold; margin-top: 20px; text-align: center; }
   </style>
 </head>
 <body>
@@ -21,7 +21,6 @@
   <div class="score" id="finalScore"></div>
 
   <script>
-    // 40-question quiz with real content
     const questions = [
       // PQC (10)
       { title: 'Which lattice-based scheme is used for digital signatures in PQC?', options: ['CRYSTALS-Kyber','CRYSTALS-Dilithium','NTRU'], answer: 'CRYSTALS-Dilithium', points: 2 },
@@ -90,7 +89,7 @@
     function submitQuiz() {
       let score = 0;
       questions.forEach((q, idx) => {
-        const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+        const sel = document.querySelector(`input[name=\`q${idx}\`]:checked`);
         if (sel && sel.value === q.answer) score += q.points;
       });
       const total = questions.reduce((sum, q) => sum + q.points, 0);
