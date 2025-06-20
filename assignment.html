@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ptah Nifty Assignment Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    h1 { color: #00274c; font-size: 2.2em; text-align: center; }
+    .question { margin: 15px 0; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .question-title { font-weight: bold; }
+    .options { margin-left: 20px; }
+    .btn { padding: 10px 16px; background: #0055a4; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; }
+    .score { font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Ptah: Nifty Assignment Quiz</h1>
+  <p>Answer all questions below and click “Submit All” to see your score.</p>
+  <form id="quizForm"></form>
+  <button class="btn" onclick="submitQuiz()">Submit All</button>
+  <div class="score" id="finalScore"></div>
+
+  <script>
+    // full 100-question array (titles, options, answers, points)
+    const questions = [
+      // PQC (10)
+      { title: 'Which PQC algorithm is standardized for digital signatures?', options:['CRYSTALS-Kyber','CRYSTALS-Dilithium','ASCON'], answer:'CRYSTALS-Dilithium', points:2 },
+      { title: 'CRYSTALS-Kyber is primarily a...', options:['Signature scheme','Key Encapsulation Mechanism','Hash function'], answer:'Key Encapsulation Mechanism', points:2 },
+      /* …add the remaining 98 questions here… */
+    ];
+
+    // Render all questions
+    const form = document.getElementById('quizForm');
+    questions.forEach((q, idx) => {
+      const div = document.createElement('div'); div.className='question';
+      const p = document.createElement('p'); p.className='question-title';
+      p.textContent = `${idx+1}. ${q.title}`; div.appendChild(p);
+      const opts = document.createElement('div'); opts.className='options';
+      q.options.forEach(opt => {
+        const label = document.createElement('label');
+        const inp = document.createElement('input'); inp.type='radio'; inp.name=`q${idx}`; inp.value=opt;
+        label.appendChild(inp); label.append(opt); opts.appendChild(label); opts.appendChild(document.createElement('br'));
+      });
+      div.appendChild(opts);
+      form.appendChild(div);
+    });
+
+    // Score calculation
+    function submitQuiz() {
+      let score = 0;
+      questions.forEach((q, idx) => {
+        const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+        if (sel && sel.value === q.answer) score += q.points;
+      });
+      document.getElementById('finalScore').textContent = `Your Score: ${score} / ${questions.length * 2}`;
+    }
+  </script>
+</body>
+</html>
