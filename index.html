@@ -2,59 +2,117 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Ptah Nifty Assignment Quiz</title>
+  <title>Ptah: Orchestrating Secure Edge-AI & Post-Quantum Crypto</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
-    h1, h2 { color: #00274c; }
-    h1 { font-size: 2.2em; text-align: center; }
-    .question { margin: 15px 0; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .question-title { font-weight: bold; }
-    .options { margin-left: 20px; }
-    .btn { padding: 10px 16px; background: #0055a4; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; }
-    .score { font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    .header { text-align: center; padding: 30px; background: #00274c; color: #fff; border-radius: 8px; }
+    .header h1 { margin: 0 0 10px; font-size: 2.5em; }
+    .header p { margin: 5px 0; }
+    .logos img { height: 60px; margin: 0 15px; }
+    .badge { display: inline-block; padding: 5px 12px; border-radius: 12px; background: #ff6f00; color: #fff; margin: 0 5px; }
+    .section { margin: 30px 0; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .section h2 { color: #00274c; margin-bottom: 10px; }
+    ul { margin-left: 1.2em; }
+    .button { display: inline-block; background: #0055a4; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+    .button:hover { background: #004080; }
   </style>
 </head>
 <body>
-  <h1>Ptah: Nifty Assignment Quiz</h1>
-  <p>Answer all questions below and click Submit to see your score.</p>
-  <form id="quizForm">
-  </form>
-  <button class="btn" onclick="submitQuiz()">Submit All</button>
-  <div class="score" id="finalScore"></div>
+  <div class="header">
+    <h1>Ptah: Secure Edge-AI & Post-Quantum Crypto in Space Systems</h1>
+    <p>Dr. Mohamed El-Hadedy • RSCL @ Cal Poly Pomona</p>
+    <p><a href="mailto:mealy@cpp.edu" style="color:#fff;">mealy@cpp.edu</a> | 909-869-2594</p>
+    <div class="logos">
+      <img src="assets/RSCL_logo.png" alt="RSCL Logo">
+      <img src="assets/Ptah_eye_logo.png" alt="Ptah Logo">
+    </div>
+    <p>
+      <span class="badge">NASA MINDS 2019</span>
+      <span class="badge">2020</span>
+      <span class="badge">2021</span>
+      <span class="badge">2022</span>
+      <span class="badge">2023</span>
+      <span class="badge">2024</span>
+      <span class="badge">2025</span>
+    </p>
+  </div>
 
-  <script>
-    const questions = [];
-    // Populate questions array same as index: PQC, LW, ORC, HW, MON (100 total)
-    // Example for first few:
-    questions.push({ title: 'Which PQC algorithm is standardized for digital signatures?', options: ['CRYSTALS-Kyber','CRYSTALS-Dilithium','ASCON'], answer: 'CRYSTALS-Dilithium', points: 2 });
-    // ... (add all 100 questions here) ...
+  <div class="section">
+    <h2>Post-Quantum Cryptography (PQC)</h2>
+    <p>Algorithms like <strong>CRYSTALS-Dilithium</strong> and <strong>CRYSTALS-Kyber</strong> resist quantum attacks by leveraging hard lattice problems. In space and edge systems, PQC secures firmware updates, telemetry data, and inter-device key exchange against “harvest-now, decrypt-later” threats.</p>
+  </div>
 
-    const form = document.getElementById('quizForm');
-    questions.forEach((q, idx) => {
-      const div = document.createElement('div');
-      div.className = 'question';
-      const p = document.createElement('p'); p.className='question-title'; p.textContent = `${idx+1}. ${q.title}`;
-      div.appendChild(p);
-      const opts = document.createElement('div'); opts.className='options';
-      q.options.forEach(opt => {
-        const label = document.createElement('label');
-        const inp = document.createElement('input'); inp.type='radio'; inp.name=`q${idx}`; inp.value=opt;
-        label.appendChild(inp); label.appendChild(document.createTextNode(' '+opt));
-        opts.appendChild(label); opts.appendChild(document.createElement('br'));
-      });
-      div.appendChild(opts);
-      form.appendChild(div);
-    });
+  <div class="section">
+    <h2>Lightweight Cryptography</h2>
+    <p><strong>Ascon</strong> (NIST’s 2023 lightweight standard) uses a sponge-based AEAD and hash design to encrypt/authenticate on tiny microcontrollers with minimal CPU, RAM, and power.</p>
+  </div>
 
-    function submitQuiz() {
-      let score=0;
-      questions.forEach((q, idx) => {
-        const sel = document.querySelector(`input[name="q${idx}"]:checked`);
-        if (sel && sel.value===q.answer) score+=q.points;
-      });
-      document.getElementById('finalScore').textContent = `Your Score: ${score} / ${questions.length*2}`;
-    }
-  </script>
+  <div class="section">
+    <h2>Orchestration Frameworks</h2>
+    <ul>
+      <li><strong>Docker Swarm:</strong> simple, ~200 MB footprint, basic features.</li>
+      <li><strong>K3s:</strong> lightweight Kubernetes (~100 MB), ideal for drones/UGVs.</li>
+      <li><strong>Kubernetes:</strong> full feature set, heavy (~1 GB+), enterprise-grade.</li>
+    </ul>
+    <p><em>K3s</em> was chosen to orchestrate containers across resource-constrained nodes while preserving rich scheduling and community support.</p>
+  </div>
+
+  <div class="section">
+    <h2>Hardware Architectures</h2>
+    <div class="logos">
+      <img src="assets/TuringPi_logo.png" alt="TuringPi">
+      <img src="assets/TRK1_logo.png" alt="TRK1">
+      <img src="assets/CM4_logo.png" alt="Raspberry Pi CM4">
+      <img src="assets/JetsonNano_logo.png" alt="Jetson Nano">
+      <img src="assets/OrinNX_logo.png" alt="Jetson Orin NX">
+      <img src="assets/ClusterHat_logo.png" alt="ClusterHat 2.5">
+    </div>
+    <ul>
+      <li><strong>TuringPi</strong> cluster of CM4/Jetson modules with built-in switch.</li>
+      <li><strong>TRK1</strong> (Rockchip RK3588 RISC-V) NPU-accelerated compute.</li>
+      <li><strong>Pi CM4</strong> nodes for general compute.</li>
+      <li><strong>Jetson Nano/Orin NX</strong> for GPU-accelerated AI inference.</li>
+      <li><strong>ClusterHat 2.5</strong> to simulate drone swarms on Pi Zero W nodes.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Telemetry & GPS Integration</h2>
+    <p>GPS modules feed data into <em>telemetry pods</em>, which then sign/encrypt readings with PQC services. On drones (Pi Zero via ClusterHat) and vehicles (TuringPi), orchestration ensures reliable data collection, security, and automatic restart on failures.</p>
+  </div>
+
+  <div class="section">
+    <h2>Pods & Container Deployment</h2>
+    <p>We package each service (crypto, telemetry, monitoring) into containers deployed as pods under K3s. Pods can be scaled, self-healed, and scheduled onto the most appropriate hardware (e.g. GPU pods on Jetson Orin).</p>
+  </div>
+
+  <div class="section">
+    <h2>Performance Monitoring</h2>
+    <p>Using <strong>Prometheus</strong> to scrape metrics (CPU, memory, crypto ops/sec, network) and <strong>Grafana</strong> dashboards, we visualize resource usage and cryptographic performance in real time, enabling alerting and bottleneck analysis.</p>
+  </div>
+
+  <div class="section">
+    <h2>15-Week Course Flow</h2>
+    <ul class="timeline">
+      <li><span>Weeks 1–3</span> Project intro, PQC & edge fundamentals, hardware setup.</li>
+      <li><span>Weeks 4–6</span> Orchestration evaluation & K3s rollout.</li>
+      <li><span>Weeks 7–9</span> PQC services (Dilithium & Kyber) containerization & benchmarking.</li>
+      <li><span>Weeks 10–11</span> ASCON implementation, GPS telemetry pipeline, Helm charts.</li>
+      <li><span>Weeks 12–13</span> Monitoring stack (Prometheus/Grafana), metrics dashboards.</li>
+      <li><span>Week 14</span> Integration tests, drone/vehicle demos, optimization.</li>
+      <li><span>Week 15</span> Final report, live demo, quizzes on key topics.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Final Quiz</h2>
+    <p>When you’re ready, dive into the comprehensive 100-question quiz covering every module. You’ll get instant feedback on each answer—all on one page.</p>
+    <p style="text-align:center;"><a href="assignment.html" class="button">Take the Final Quiz</a></p>
+  </div>
+
+  <div class="section">
+    <h2>Acknowledgments</h2>
+    <p>Special thanks to NASA (MINDS), U.S. Navy, AMD/Xilinx, NVIDIA, AFRL, and RSCL for hardware, funding, and expertise that made this course possible.</p>
+  </div>
 </body>
 </html>
-
