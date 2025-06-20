@@ -220,20 +220,173 @@ resources:
     </ul>
   </div>
 
-  <div class="section">
-    <h2>Telemetry & GPS Integration</h2>
-    <p>GPS modules feed data into <em>telemetry pods</em>, which then sign/encrypt readings with PQC services. On drones (Pi Zero via ClusterHat) and vehicles (TuringPi), orchestration ensures reliable data collection, security, and automatic restart on failures.</p>
-  </div>
+ <div class="section">
+  <h2>🛰️ Telemetry & GPS Integration</h2>
+  <p>
+    Robust, low-latency telemetry and precise positioning are critical for autonomous drones, rovers, and space systems. In the Ptah framework, each node—whether a Raspberry Pi Zero in a drone swarm or a Compute Module 4 in a rover—interfaces with GNSS/GPS modules via UART or USB. Data from the GNSS receiver (e.g., NMEA sentences) is ingested by a dedicated <em>telemetry pod</em> container running under K3s, which performs the following pipeline:
+  </p>
+  <ol>
+    <li><strong>Raw Acquisition:</strong> Initialize and configure the GPS module for optimal update rates (1–10 Hz) and multiple constellations (GPS+GLONASS/Beidou) via serial interface.</li>
+    <li><strong>Data Parsing & Filtering:</strong> A sidecar normalizes incoming sentences and filters out low-accuracy fixes (<3 m HDOP) to ensure only high-quality position data is used.</li>
+    <li><strong>Cryptographic Protection:</strong> The main container applies PQC—signing with CRYSTALS-Dilithium (~2 ms/signature on CM4) and/or encrypting via CRYSTALS-Kyber (~1 ms/KEM)—guaranteeing authenticity and confidentiality against quantum threats.</li>
+    <li><strong>Publishing & QoS:</strong> Packaged payloads are published to MQTT or REST endpoints using QoS 2 for exactly-once delivery, or HTTP/2 with TLS-PQC for low-latency streaming.</li>
+    <li><strong>Fault Recovery:</strong> Liveness and readiness probes detect failures (e.g., serial disconnect) and Kubernetes restarts pods within seconds, maintaining continuous telemetry flow.</li>
+  </ol>
 
-  <div class="section">
-    <h2>Pods & Container Deployment</h2>
-    <p>We package each service (crypto, telemetry, monitoring) into containers deployed as pods under K3s. Pods can be scaled, self-healed, and scheduled onto the most appropriate hardware (e.g. GPU pods on Jetson Orin).</p>
-  </div>
+  <h3>Performance & Accuracy Metrics</h3>
+  <table>
+    <tr><th>Metric</th><th>Pi Zero</th><th>CM4</th><th>TRK1 / Orin NX</th></tr>
+    <tr><td>GPS Fix Rate</td><td>1 Hz</td><td>5 Hz</td><td>10 Hz</td></tr>
+    <tr><td>Signature Latency</td><td>~8 ms</td><td>~2 ms</td><td><0.5 ms</td></tr>
+    <tr><td>KEM Latency</td><td>~6 ms</td><td>~1 ms</td><0.3 ms</td></tr>
+    <tr><td>End-to-End Delay</td><td>~20 ms</td><td>~8 ms</td><td>~3 ms</td></tr>
+  </table>
 
-  <div class="section">
-    <h2>Performance Monitoring</h2>
-    <p>Using <strong>Prometheus</strong> to scrape metrics (CPU, memory, crypto ops/sec, network) and <strong>Grafana</strong> dashboards, we visualize resource usage and cryptographic performance in real time, enabling alerting and bottleneck analysis.</p>
-  </div>
+  <h3>Deployment Scenarios</h3>
+  <ul>
+    <li><strong>Drone Swarms (ClusterHAT):</strong> Pi Zero nodes run telemetry pods (CPU <10%, RAM <50 MB) to sign and publish location data for coordinated swarm navigation and anti-spoofing.</li>
+    <li><strong>UGV & Rover Platforms (TuringPi + CM4):</strong> Multiple CM4/TRK1 modules host redundant telemetry services, providing 5–10 Hz update rates and high-assurance signing for real-time mapping.</li>
+    <li><strong>Space-Grade Emulation:</strong> On TRK1 or Orin NX nodes, advanced telemetry pods integrate Kalman filtering and PQC to simulate deep-space navigation and secure ground telemetry uplinks.</li>
+  </ul>
+
+  <p>
+    By orchestrating these telemetry pods within K3s, Ptah delivers a scalable, secure, and fault-tolerant GNSS data pipeline across heterogeneous edge hardware—empowering next-generation autonomous and space systems with quantum-proof positioning.
+  </p>
+</div>
+
+
+ <div class="section">
+  <h2>📦 Pods & Container Deployment</h2>
+  <p>
+    In Ptah, every core function—post-quantum signing/encryption, telemetry acquisition, and monitoring—is packaged as a self-contained Docker image and deployed as a <em>pod</em> under K3s. This approach yields:
+  </p>
+  <ul>
+    <li>
+      <strong>Scalability:</strong> Define <code>replicaCount</code> in your Helm chart to scale a POD from 1 to N instances (e.g., running multiple Dilithium signers in parallel).
+    </li>
+    <li>
+      <strong>Resilience & Self-Healing:</strong> Liveness and readiness probes restart crashed containers automatically. For example, if a telemetry pod loses its GPS connection, K3s will recreate it within seconds.
+    </li>
+    <li>
+      <strong>Resource-Aware Scheduling:</strong>  
+      <ul>
+        <li>Use <code>resources.requests</code> and <code>resources.limits</code> to reserve CPU/RAM exactly—for example, <code>0.5 CPU</code> and <code>256Mi</code> for a PQC service on CM4.</li>
+        <li>Leverage <code>nodeSelector</code> or <code>affinity</code> rules to pin GPU-intensive pods to Jetson Orin NX (requesting <code>nvidia.com/gpu: 1</code>), while lightweight ASCON pods run on Pi Zero nodes.</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Sidecar & Init Containers:</strong>  
+      <ul>
+        <li>An init container can wait for hardware readiness (e.g., ensure the GPS serial port is available before starting the telemetry app).</li>
+        <li>A sidecar can run a small heartbeat exporter, feeding health metrics to Prometheus without modifying the main application.</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Rolling Updates & Canary Deployments:</strong>  
+      <ul>
+        <li>Set <code>strategy.type: RollingUpdate</code> so PQC libraries can be patched without downtime—K3s will bring up new pods with the updated container image and gracefully retire old ones.</li>
+        <li>Use <code>maxSurge</code> and <code>maxUnavailable</code> to control the pace of updates, crucial when running on mission-critical UGVs or drone networks.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>Example Pod Spec</h3>
+  <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: pqc-signer
+  labels:
+    app: pqc
+spec:
+  initContainers:
+  - name: wait-for-gps
+    image: busybox
+    command: ["sh", "-c", "until test -e /dev/ttyUSB0; do sleep 1; done"]
+    volumeMounts:
+      - mountPath: /dev/ttyUSB0
+        name: gps-device
+  containers:
+  - name: signer
+    image: rscl/pqc-signer:latest
+    resources:
+      requests:
+        cpu: "0.5"
+        memory: "256Mi"
+      limits:
+        cpu: "1"
+        memory: "512Mi"
+    volumeMounts:
+      - mountPath: /dev/ttyUSB0
+        name: gps-device
+    livenessProbe:
+      exec:
+        command: ["pgrep", "signer"]
+      initialDelaySeconds: 10
+      periodSeconds: 30
+  volumes:
+    - name: gps-device
+      hostPath:
+        path: /dev/ttyUSB0
+  nodeSelector:
+    kubernetes.io/hostname: cm4-node-01
+</code></pre>
+  <p>
+    This spec ensures the signer pod only runs on a CM4 node, waits for its GPS device, reserves half a CPU core, and restarts if the process dies—demonstrating the full power of K3s pod orchestration in Ptah’s heterogeneous cluster.
+  </p>
+</div>
+
+
+ <div class="section">
+  <h2>📈 Performance Monitoring</h2>
+  <p>
+    To maintain operational excellence across a heterogeneous Ptah cluster, we employ a best-in-class monitoring stack:
+  </p>
+  <ol>
+    <li>
+      <strong>Metrics Collection (Prometheus):</strong>  
+      • <em>Node Exporter</em> on each Linux node (CM4, TRK1, Jetsons, Pi Zeros) scrapes CPU, memory, filesystem, and temperature.  
+      • <em>cAdvisor</em> or <em>kubelet metrics</em> expose container-level stats: CPU throttling, memory usage, network I/O.  
+      • Custom <em>PQC Exporter</em> in each crypto pod emits counters (signatures/sec, KEM ops/sec) and histograms (latency distribution).
+    </li>
+    <li>
+      <strong>Storage & Retention:</strong>  
+      • Prometheus TSDB stores high-resolution (1s scrape) data for 24 h, then down-samples to 1 min resolution for 30 days.  
+      • Remote write to long-term storage (e.g., Thanos or Cortex) for 1 year of historical analysis.
+    </li>
+    <li>
+      <strong>Visualization (Grafana):</strong>  
+      • Dashboards for each hardware class:  
+      &nbsp;– CPU & Memory Utilization vs. Crypto Throughput (ops/sec)  
+      &nbsp;– Network Bandwidth & Packet Loss for telemetry streams  
+      &nbsp;– GPU Utilization and Temperature on Jetson modules  
+      • Alert rules:  
+      &nbsp;– CPU >90 % for >1 min triggers High-Load alert  
+      &nbsp;– Signature latency >5 ms on CM4 triggers Performance-degradation alert  
+      &nbsp;– Missing telemetry heartbeat (>3 scrapes) triggers Pod-restart action
+    </li>
+    <li>
+      <strong>Sample PromQL Queries:</strong>
+      <pre><code># CPU usage on CM4 nodes
+avg(rate(node_cpu_seconds_total{instance=~"cm4-.*",mode!="idle"}[1m])) by (instance)
+
+# PQC ops per second
+rate(pqc_signatures_total[30s])
+
+# Telemetry packet latency
+histogram_quantile(0.95, rate(telemetry_latency_seconds_bucket[5m]))
+      </code></pre>
+    </li>
+    <li>
+      <strong>Scalability & Federation:</strong>  
+      • Shard scraping across multiple Prometheus replicas for large swarms (>100 nodes).  
+      • Use Prometheus Federation to centralize critical metrics (e.g., overall cluster health) while preserving local dashboards.
+    </li>
+  </ol>
+  <p>
+    This comprehensive monitoring framework not only provides real-time visibility into resource usage and cryptographic performance but also enables automated alerting and long-term trend analysis—ensuring that Ptah deployments remain robust, performant, and mission-ready.
+  </p>
+</div>
+
 
   <div class="section">
     <h2>15-Week Course Flow</h2>
