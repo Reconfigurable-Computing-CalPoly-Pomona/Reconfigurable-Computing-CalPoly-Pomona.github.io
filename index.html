@@ -58,20 +58,134 @@
 </div>
 
 
-  <div class="section">
-    <h2>Lightweight Cryptography</h2>
-    <p><strong>Ascon</strong> (NIST’s 2023 lightweight standard) uses a sponge-based AEAD and hash design to encrypt/authenticate on tiny microcontrollers with minimal CPU, RAM, and power.</p>
-  </div>
+ <div class="section">
+  <h2>🔒 Lightweight Cryptography</h2>
 
-  <div class="section">
-    <h2>Orchestration Frameworks</h2>
-    <ul>
-      <li><strong>Docker Swarm:</strong> simple, ~200 MB footprint, basic features.</li>
-      <li><strong>K3s:</strong> lightweight Kubernetes (~100 MB), ideal for drones/UGVs.</li>
-      <li><strong>Kubernetes:</strong> full feature set, heavy (~1 GB+), enterprise-grade.</li>
-    </ul>
-    <p><em>K3s</em> was chosen to orchestrate containers across resource-constrained nodes while preserving rich scheduling and community support.</p>
-  </div>
+  <p>
+    While traditional ciphers like AES excel in data centers, they’re too heavy for tiny, battery-powered edge nodes. 
+    <strong>Lightweight cryptography</strong> fills that gap by delivering strong security with minimal footprint—CPU cycles, RAM, and power.
+  </p>
+
+  <!-- Comparison: AEAD vs Block Ciphers -->
+  <h3>AEAD vs. Block Ciphers</h3>
+  <table>
+    <tr><th>Feature</th><th>AEAD (e.g. Ascon)</th><th>Block Cipher + MAC (e.g. AES-GCM)</th></tr>
+    <tr><td>Encryption + Auth</td><td>Single pass, atomic</td><td>Two steps (encrypt then tag)</td></tr>
+    <tr><td>Code Size</td><td>≈2–5 kB</td><td>≈10–20 kB</td></tr>
+    <tr><td>RAM Usage</td><td>≈200–500 bytes</td><td>≈1–2 kB</td></tr>
+    <tr><td>Throughput</td><td>2–5 cycles/byte</td><td>10–15 cycles/byte</td></tr>
+    <tr><td>Security Goal</td><td>Confidentiality & Authenticity</td><td>Confidentiality & Authenticity</td></tr>
+  </table>
+
+  <!-- ASCON Deep Dive -->
+  <h3>ASCON Internals</h3>
+  <img src="assets/Ascon_sponge_diagram.png" alt="Ascon Sponge Diagram" style="display:block;margin:10px auto;max-width:400px;">
+  <table>
+    <tr><th>Property</th><th>Value</th></tr>
+    <tr><td>Permutation Size</td><td>320 bits (5 x 64-bit lanes)</td></tr>
+    <tr><td>Rate</td><td>64 bits / 8 bytes per absorption/squeeze</td></tr>
+    <tr><td>Initialization Rounds</td><td>12</td></tr>
+    <tr><td>Intermediate Rounds</td><td>6</td></tr>
+    <tr><td>Finalization Rounds</td><td>12</td></tr>
+    <tr><td>Key Size</td><td>128 bits (optional 256 bits)</td></tr>
+    <tr><td>Nonce Size</td><td>128 bits</td></tr>
+    <tr><td>Tag Size</td><td>128 bits</td></tr>
+    <tr><td>Performance (Cortex-M4)</td><td>≈1 MB/s</td></tr>
+  </table>
+
+  <p>
+    ASCON’s design is built around a <em>sponge construction</em>, where data and keys are absorbed into an internal state 
+    that is repeatedly permuted. This single-pass approach (absorb-permute-squeeze) gives both encryption and
+    authentication in one go, cutting code size and RAM needs by up to 50% compared with AES-GCM on the same hardware.
+  </p>
+
+  <!-- Security Comparison -->
+  <h3>Security Strength vs. Block Ciphers</h3>
+  <table>
+    <tr><th>Security Aspect</th><th>ASCON (128-bit key)</th><th>AES-128 (GCM)</th></tr>
+    <tr><td>Bit-security</td><td>≥ 128 bits</td><td>128 bits</td></tr>
+    <tr><td>Integrity Bound</td><td>2^64 forgery bound</td><td>2^64 forgery bound</td></tr>
+    <tr><td>Resistance to Side-Channel</td><td>Simple permutation—easier to mask</td><td>Complex S-boxes—harder to mask</td></tr>
+  </table>
+
+  <p>
+    By choosing ASCON for Ptah’s edge modules, we ensure each micro-controller—or even a small FPGA slice—can 
+    authenticate and encrypt telemetry with minimal overhead, leaving headroom for sensor processing and control loops.
+  </p>
+</div>
+
+
+<div class="section">
+  <h2>⚙️ Orchestration Frameworks</h2>
+  <p>
+    Managing a distributed Edge-AI/PQC cluster requires a lightweight yet powerful orchestrator. Below we compare three leading container orchestration platforms on footprint, feature set, and resource utilization—then dive deeper into how GPU scheduling and CPU allocation work in K3s for drones and UGVs.
+  </p>
+
+  <!-- Topology Diagram Placeholder -->
+  <p style="text-align: center;">
+    <img src="assets/orchestration_topology.png" alt="Cluster Topology Diagram" style="max-width:600px; width:100%;">
+  </p>
+
+  <!-- Feature & Footprint Comparison -->
+  <h3>Feature & Footprint Comparison</h3>
+  <table>
+    <tr><th>Framework</th><th>Binary Size</th><th>Memory Overhead<sup>1</sup></th><th>Supported APIs</th><th>Ideal Use Case</th></tr>
+    <tr><td><strong>Docker Swarm</strong></td><td>~200 MB</td><td>~150 MB</td><td>Core Swarm, Stacks</td><td>Simple clusters & rapid prototyping</td></tr>
+    <tr><td><strong>K3s</strong></td><td>~50 MB</td><td>~70 MB</td><td>Kubernetes v1.x (core)</td><td>Edge/IoT & power-constrained nodes</td></tr>
+    <tr><td><strong>Kubernetes</strong></td><td>~1 GB+</td><td>~1 GB+</td><td>Full k8s API</td><td>Enterprise datacenters</td></tr>
+  </table>
+  <p><sup>1</sup> Memory measured as RSS of control-plane components on a baseline Pi 4.</p>
+
+  <!-- CPU & GPU Scheduling -->
+  <h3>CPU & GPU Resource Allocation</h3>
+  <p>
+    In K3s, you can label nodes with <code>cpu</code> and <code>gpu</code> capacity, then request them in your Pod specs. Below is an example of how a PQC service and an AI inference service would request resources:
+  </p>
+  <pre><code># PQC signature service (runs on any CPU node)
+resources:
+  requests:
+    cpu: "0.5"
+    memory: "256Mi"
+  limits:
+    cpu: "1"
+    memory: "512Mi"
+
+# AI inference service (runs on GPU-enabled node)
+resources:
+  limits:
+    nvidia.com/gpu: 1
+    memory: "1Gi"
+</code></pre>
+
+  <!-- Performance Estimates -->
+  <h3>Performance Estimates</h3>
+  <table>
+    <tr><th>Node Type</th><th>CPU Cores</th><th>Clock (GHz)</th><th>GPU Cores</th><th>Approx. Throughput</th></tr>
+    <tr><td>Raspberry Pi CM4</td><td>4</td><td>1.5</td><td>–</td><td>~200 Dilithium ops/sec</td></tr>
+    <tr><td>TRK1 (Rockchip RK3588)</td><td>8</td><td>2.4</td><td>–</td><td>~1 200 Dilithium ops/sec</td></tr>
+    <tr><td>Jetson Nano</td><td>4</td><td>1.43</td><td>128 (Maxwell)</td><td>– GPU: ~500 ASCON ops/sec<br>– CPU: ~400 Dilithium ops/sec</td></tr>
+    <tr><td>Jetson Orin NX</td><td>6</td><td>2.2</td><td>1024 (Ampere)</td><td>– GPU: ~5 000 ASCON ops/sec<br>– CPU: ~800 Dilithium ops/sec</td></tr>
+  </table>
+
+  <!-- When to use which -->
+  <h3>Which to Choose?</h3>
+  <ul>
+    <li>
+      <strong>Drone Swarms (ClusterHat):</strong> K3s on Pi Zero W can run ultra-light pods (<code>cpu: "0.1"</code>) with Ascon AEAD for telemetry, preserving battery life.
+    </li>
+    <li>
+      <strong>UGV / Rover Platforms (TuringPi + Orin NX):</strong> K3s with GPU scheduling enables offloading neural nets to Orin NX while still hosting PQC services on CM4 nodes.
+    </li>
+    <li>
+      <strong>Hybrid Deployments:</strong> Leverage <code>nodeSelector</code> and <code>affinity</code> to ensure heavy workloads land on TRK1/Orin, and lightweight tasks run on Pi-class nodes.
+    </li>
+  </ul>
+
+  <p>
+    By using K3s with fine-grained resource requests and node labels, you can orchestrate a heterogeneous cluster that maximizes both performance and power-efficiency—crucial attributes for computer architects designing next-generation edge-AI & space systems.
+  </p>
+</div>
+
 
   <div class="section">
     <h2>Hardware Architectures</h2>
