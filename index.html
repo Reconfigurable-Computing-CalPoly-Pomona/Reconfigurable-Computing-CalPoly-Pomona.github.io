@@ -225,14 +225,43 @@
   </p>
 
   <!-- Feature & Footprint Comparison -->
-  <h3>Feature & Footprint Comparison</h3>
-  <table>
-    <tr><th>Framework</th><th>Binary Size</th><th>Memory Overhead<sup>1</sup></th><th>Supported APIs</th><th>Ideal Use Case</th></tr>
-    <tr><td><strong>Docker Swarm</strong></td><td>~200 MB</td><td>~150 MB</td><td>Core Swarm, Stacks</td><td>Simple clusters & rapid prototyping</td></tr>
-    <tr><td><strong>K3s</strong></td><td>~50 MB</td><td>~70 MB</td><td>Kubernetes v1.x (core)</td><td>Edge/IoT & power-constrained nodes</td></tr>
-    <tr><td><strong>Kubernetes</strong></td><td>~1 GB+</td><td>~1 GB+</td><td>Full k8s API</td><td>Enterprise datacenters</td></tr>
-  </table>
-  <p><sup>1</sup> Memory measured as RSS of control-plane components on a baseline Pi 4.</p>
+ <h3>Feature & Footprint Comparison</h3>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left; padding:8px;">Framework</th>
+      <th style="text-align:center; padding:8px;">Binary Size</th>
+      <th style="text-align:center; padding:8px;">Memory Overhead<sup>1</sup></th>
+      <th style="text-align:center; padding:8px;">Supported APIs</th>
+      <th style="text-align:center; padding:8px;">Ideal Use Case</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:8px;"><strong>Docker Swarm</strong></td>
+      <td style="text-align:center; padding:8px;">~200 MB</td>
+      <td style="text-align:center; padding:8px;">~150 MB</td>
+      <td style="text-align:center; padding:8px;">Core Swarm, Stacks</td>
+      <td style="text-align:center; padding:8px;">Simple clusters & rapid prototyping</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;"><strong>K3s</strong></td>
+      <td style="text-align:center; padding:8px;">~50 MB</td>
+      <td style="text-align:center; padding:8px;">~70 MB</td>
+      <td style="text-align:center; padding:8px;">Kubernetes v1.x (core)</td>
+      <td style="text-align:center; padding:8px;">Edge/IoT & power-constrained nodes</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;"><strong>Kubernetes</strong></td>
+      <td style="text-align:center; padding:8px;">~1 GB+</td>
+      <td style="text-align:center; padding:8px;">~1 GB+</td>
+      <td style="text-align:center; padding:8px;">Full k8s API</td>
+      <td style="text-align:center; padding:8px;">Enterprise datacenters</td>
+    </tr>
+  </tbody>
+</table>
+<p><sup>1</sup> Memory measured as RSS of control-plane components on a baseline Pi 4.</p>
+
 
   <!-- CPU & GPU Scheduling -->
   <h3>CPU & GPU Resource Allocation</h3>
@@ -256,14 +285,54 @@ resources:
 </code></pre>
 
   <!-- Performance Estimates -->
-  <h3>Performance Estimates</h3>
-  <table>
-    <tr><th>Node Type</th><th>CPU Cores</th><th>Clock (GHz)</th><th>GPU Cores</th><th>Approx. Throughput</th></tr>
-    <tr><td>Raspberry Pi CM4</td><td>4</td><td>1.5</td><td>–</td><td>~200 Dilithium ops/sec</td></tr>
-    <tr><td>TRK1 (Rockchip RK3588)</td><td>8</td><td>2.4</td><td>–</td><td>~1 200 Dilithium ops/sec</td></tr>
-    <tr><td>Jetson Nano</td><td>4</td><td>1.43</td><td>128 (Maxwell)</td><td>– GPU: ~500 ASCON ops/sec<br>– CPU: ~400 Dilithium ops/sec</td></tr>
-    <tr><td>Jetson Orin NX</td><td>6</td><td>2.2</td><td>1024 (Ampere)</td><td>– GPU: ~5 000 ASCON ops/sec<br>– CPU: ~800 Dilithium ops/sec</td></tr>
-  </table>
+ <h3>Performance Estimates</h3>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left; padding:8px;">Node Type</th>
+      <th style="text-align:center; padding:8px;">CPU Cores</th>
+      <th style="text-align:center; padding:8px;">Clock (GHz)</th>
+      <th style="text-align:center; padding:8px;">GPU Cores</th>
+      <th style="text-align:center; padding:8px;">Approx. Throughput</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:8px;">Raspberry Pi CM4</td>
+      <td style="text-align:center; padding:8px;">4</td>
+      <td style="text-align:center; padding:8px;">1.50</td>
+      <td style="text-align:center; padding:8px;">–</td>
+      <td style="padding:8px;">~200 Dilithium ops/sec</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">TRK1 (Rockchip RK3588)</td>
+      <td style="text-align:center; padding:8px;">8</td>
+      <td style="text-align:center; padding:8px;">2.40</td>
+      <td style="text-align:center; padding:8px;">–</td>
+      <td style="padding:8px;">~1 200 Dilithium ops/sec</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Jetson Nano</td>
+      <td style="text-align:center; padding:8px;">4</td>
+      <td style="text-align:center; padding:8px;">1.43</td>
+      <td style="text-align:center; padding:8px;">128 (Maxwell)</td>
+      <td style="padding:8px;">
+        • GPU: ~500 ASCON ops/sec<br>
+        • CPU: ~400 Dilithium ops/sec
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Jetson Orin NX</td>
+      <td style="text-align:center; padding:8px;">6</td>
+      <td style="text-align:center; padding:8px;">2.20</td>
+      <td style="text-align:center; padding:8px;">1024 (Ampere)</td>
+      <td style="padding:8px;">
+        • GPU: ~5 000 ASCON ops/sec<br>
+        • CPU: ~800 Dilithium ops/sec
+      </td>
+    </tr>
+  </tbody>
+</table>
 
   <!-- When to use which -->
   <h3>Which to Choose?</h3>
