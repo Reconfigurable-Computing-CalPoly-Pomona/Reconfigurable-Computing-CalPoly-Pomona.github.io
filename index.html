@@ -81,31 +81,94 @@
   </p>
 
   <!-- Comparison: AEAD vs Block Ciphers -->
-  <h3>AEAD vs. Block Ciphers</h3>
-  <table>
-    <tr><th>Feature</th><th>AEAD (e.g. Ascon)</th><th>Block Cipher + MAC (e.g. AES-GCM)</th></tr>
-    <tr><td>Encryption + Auth</td><td>Single pass, atomic</td><td>Two steps (encrypt then tag)</td></tr>
-    <tr><td>Code Size</td><td>≈2–5 kB</td><td>≈10–20 kB</td></tr>
-    <tr><td>RAM Usage</td><td>≈200–500 bytes</td><td>≈1–2 kB</td></tr>
-    <tr><td>Throughput</td><td>2–5 cycles/byte</td><td>10–15 cycles/byte</td></tr>
-    <tr><td>Security Goal</td><td>Confidentiality & Authenticity</td><td>Confidentiality & Authenticity</td></tr>
-  </table>
+<h3>AEAD vs. Block Cipher Comparison</h3>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left; padding:8px;">Feature</th>
+      <th style="text-align:center; padding:8px;">AEAD (e.g., Ascon)</th>
+      <th style="text-align:center; padding:8px;">Block Cipher + MAC (e.g., AES-GCM)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:8px;">Encryption + Authentication</td>
+      <td style="text-align:center; padding:8px;">Single pass (atomic)</td>
+      <td style="text-align:center; padding:8px;">Two steps (encrypt, then tag)</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Code Size</td>
+      <td style="text-align:center; padding:8px;">≈ 2 – 5 kB</td>
+      <td style="text-align:center; padding:8px;">≈ 10 – 20 kB</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">RAM Usage</td>
+      <td style="text-align:center; padding:8px;">≈ 200 – 500 bytes</td>
+      <td style="text-align:center; padding:8px;">≈ 1 – 2 kB</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Throughput (cycles/byte)</td>
+      <td style="text-align:center; padding:8px;">2 – 5</td>
+      <td style="text-align:center; padding:8px;">10 – 15</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Security Goal</td>
+      <td style="text-align:center; padding:8px;">Confidentiality &amp; Authenticity</td>
+      <td style="text-align:center; padding:8px;">Confidentiality &amp; Authenticity</td>
+    </tr>
+  </tbody>
+</table>
 
   <!-- ASCON Deep Dive -->
   <h3>ASCON Internals</h3>
   <img src="assets/Ascon_sponge_diagram.png" alt="Ascon Sponge Diagram" style="display:block;margin:10px auto;max-width:400px;">
   <table>
-    <tr><th>Property</th><th>Value</th></tr>
-    <tr><td>Permutation Size</td><td>320 bits (5 x 64-bit lanes)</td></tr>
-    <tr><td>Rate</td><td>64 bits / 8 bytes per absorption/squeeze</td></tr>
-    <tr><td>Initialization Rounds</td><td>12</td></tr>
-    <tr><td>Intermediate Rounds</td><td>6</td></tr>
-    <tr><td>Finalization Rounds</td><td>12</td></tr>
-    <tr><td>Key Size</td><td>128 bits (optional 256 bits)</td></tr>
-    <tr><td>Nonce Size</td><td>128 bits</td></tr>
-    <tr><td>Tag Size</td><td>128 bits</td></tr>
-    <tr><td>Performance (Cortex-M4)</td><td>≈1 MB/s</td></tr>
-  </table>
+  <thead>
+    <tr>
+      <th style="text-align:left; padding:8px;">Property</th>
+      <th style="text-align:center; padding:8px;">Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:8px;">Permutation Size</td>
+      <td style="text-align:center; padding:8px;">320 bits (5 × 64-bit lanes)</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Rate</td>
+      <td style="text-align:center; padding:8px;">64 bits / 8 bytes per absorption/squeeze</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Initialization Rounds</td>
+      <td style="text-align:center; padding:8px;">12</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Intermediate Rounds</td>
+      <td style="text-align:center; padding:8px;">6</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Finalization Rounds</td>
+      <td style="text-align:center; padding:8px;">12</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Key Size</td>
+      <td style="text-align:center; padding:8px;">128 bits (optional 256 bits)</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Nonce Size</td>
+      <td style="text-align:center; padding:8px;">128 bits</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Tag Size</td>
+      <td style="text-align:center; padding:8px;">128 bits</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Performance (Cortex-M4)</td>
+      <td style="text-align:center; padding:8px;">≈ 1 MB/s</td>
+    </tr>
+  </tbody>
+</table>
+
 
   <p>
     ASCON’s design is built around a <em>sponge construction</em>, where data and keys are absorbed into an internal state 
@@ -114,13 +177,34 @@
   </p>
 
   <!-- Security Comparison -->
-  <h3>Security Strength vs. Block Ciphers</h3>
-  <table>
-    <tr><th>Security Aspect</th><th>ASCON (128-bit key)</th><th>AES-128 (GCM)</th></tr>
-    <tr><td>Bit-security</td><td>≥ 128 bits</td><td>128 bits</td></tr>
-    <tr><td>Integrity Bound</td><td>2^64 forgery bound</td><td>2^64 forgery bound</td></tr>
-    <tr><td>Resistance to Side-Channel</td><td>Simple permutation—easier to mask</td><td>Complex S-boxes—harder to mask</td></tr>
-  </table>
+<h3>Security Strength vs. Block Ciphers</h3>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left; padding:8px;">Security Aspect</th>
+      <th style="text-align:center; padding:8px;">ASCON (128-bit key)</th>
+      <th style="text-align:center; padding:8px;">AES-128 (GCM)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:8px;">Bit-security</td>
+      <td style="text-align:center; padding:8px;">≥ 128 bits</td>
+      <td style="text-align:center; padding:8px;">128 bits</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Integrity Bound</td>
+      <td style="text-align:center; padding:8px;">2⁶⁴ forgery bound</td>
+      <td style="text-align:center; padding:8px;">2⁶⁴ forgery bound</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Side-Channel Resistance</td>
+      <td style="text-align:center; padding:8px;">Simple permutation – easier to mask</td>
+      <td style="text-align:center; padding:8px;">Complex S-boxes – harder to mask</td>
+    </tr>
+  </tbody>
+</table>
+
 
   <p>
     By choosing ASCON for Ptah’s edge modules, we ensure each micro-controller—or even a small FPGA slice—can 
