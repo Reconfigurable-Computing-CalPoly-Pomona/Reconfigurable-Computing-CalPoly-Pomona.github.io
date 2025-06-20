@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Ptah Nifty Assignment Quiz</title>
+  <title>Ptah: Nifty Assignment Quiz</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
     h1 { color: #00274c; font-size: 2.2em; text-align: center; }
@@ -21,25 +21,66 @@
   <div class="score" id="finalScore"></div>
 
   <script>
-    // full 100-question array (titles, options, answers, points)
+    // 40-question quiz with real content
     const questions = [
       // PQC (10)
-      { title: 'Which PQC algorithm is standardized for digital signatures?', options:['CRYSTALS-Kyber','CRYSTALS-Dilithium','ASCON'], answer:'CRYSTALS-Dilithium', points:2 },
-      { title: 'CRYSTALS-Kyber is primarily a...', options:['Signature scheme','Key Encapsulation Mechanism','Hash function'], answer:'Key Encapsulation Mechanism', points:2 },
-      /* …add the remaining 98 questions here… */
+      { title: 'Which lattice-based scheme is used for digital signatures in PQC?', options: ['CRYSTALS-Kyber','CRYSTALS-Dilithium','NTRU'], answer: 'CRYSTALS-Dilithium', points: 2 },
+      { title: 'CRYSTALS-Kyber is primarily a:', options: ['Signature scheme','Key Encapsulation Mechanism','Hash function'], answer: 'Key Encapsulation Mechanism', points: 2 },
+      { title: 'PQC resistance relies on which hard problem?', options: ['Integer Factorization','Discrete Logarithm','Learning With Errors'], answer: 'Learning With Errors', points: 2 },
+      { title: 'Dilithium’s rejection sampling prevents leakage of:', options: ['Secret key bits','Public parameters','Nonce values'], answer: 'Secret key bits', points: 2 },
+      { title: 'Kyber’s ciphertext size is optimized via:', options: ['Polynomial compression','Block chaining','Key stretching'], answer: 'Polynomial compression', points: 2 },
+      { title: 'Dilithium verification extracts which value?', options: ['Error vector','Public matrix','Private seed'], answer: 'Public matrix', points: 2 },
+      { title: 'Kyber’s shared secret is derived using:', options: ['Diffie-Hellman','Hash-based KDF','AES key wrap'], answer: 'Hash-based KDF', points: 2 },
+      { title: 'Which Dilithium parameter set offers NIST level 3 security?', options: ['Dilithium-I','Dilithium-II','Dilithium-III'], answer: 'Dilithium-III', points: 2 },
+      { title: 'Kyber’s NIST security category is:', options: ['Category 1','Category 3','Category 5'], answer: 'Category 3', points: 2 },
+      { title: 'Dilithium signatures are best suited for:', options: ['Firmware updates','Random number generation','Bulk encryption'], answer: 'Firmware updates', points: 2 },
+      // Lightweight Crypto (10)
+      { title: 'ASCON uses which permutation-based model?', options: ['Sponge','Feistel','Substitution-Permutation'], answer: 'Sponge', points: 2 },
+      { title: 'ASCON state width in bits is:', options: ['320','256','512'], answer: '320', points: 2 },
+      { title: 'AEAD stands for:', options: ['Authenticated Encryption with Associated Data','Asymmetric Encryption and Decryption','Advanced Encryption and Authentic Data'], answer: 'Authenticated Encryption with Associated Data', points: 2 },
+      { title: 'Number of initialization rounds in ASCON:', options: ['12','6','10'], answer: '12', points: 2 },
+      { title: 'ASCON tag size is:', options: ['64 bits','128 bits','256 bits'], answer: '128 bits', points: 2 },
+      { title: 'ASCON is optimized for:', options: ['32-bit microcontrollers','GPUs','Desktop CPUs'], answer: '32-bit microcontrollers', points: 2 },
+      { title: 'ASCON’s permutation is denoted as:', options: ['p^12','π','f'], answer: 'p^12', points: 2 },
+      { title: 'ASCON was standardized by NIST in:', options: ['2022','2023','2024'], answer: '2023', points: 2 },
+      { title: 'Lightweight crypto is vital for:', options: ['IoT devices','Mainframes','Blockchain'], answer: 'IoT devices', points: 2 },
+      { title: 'ASCON’s duplex construction integrates:', options: ['Encryption & Authentication','Hashing only','Key exchange'], answer: 'Encryption & Authentication', points: 2 },
+      // Orchestration (10)
+      { title: 'Which orchestrator binary is smallest?', options: ['Docker Swarm','K3s','Kubernetes'], answer: 'K3s', points: 2 },
+      { title: 'K3s default datastore is:', options: ['etcd','SQLite','Consul'], answer: 'SQLite', points: 2 },
+      { title: 'Command to initialize Swarm:', options: ['docker swarm init','swarm start','docker init swarm'], answer: 'docker swarm init', points: 2 },
+      { title: 'Kubernetes service type for external LB:', options: ['ClusterIP','NodePort','LoadBalancer'], answer: 'LoadBalancer', points: 2 },
+      { title: 'Helm chart templates reside in:', options: ['templates','charts','deploy'], answer: 'templates', points: 2 },
+      { title: 'Pod anti-affinity is configured under:', options: ['affinity','tolerations','selectors'], answer: 'affinity', points: 2 },
+      { title: 'K3s stands for:', options: ['Kube-slim','Kube-s-prod','Lightweight Kubernetes'], answer: 'Lightweight Kubernetes', points: 2 },
+      { title: 'Default Swarm scheduler:', options: ['Spread','Binpack','Random'], answer: 'Spread', points: 2 },
+      { title: 'K8s control-plane port:', options: ['6443','8080','2379'], answer: '6443', points: 2 },
+      { title: 'Rollout status command:', options: ['kubectl rollout status','kubectl status rollout','kubectl get rollout'], answer: 'kubectl rollout status', points: 2 },
+      // Hardware (5)
+      { title: 'TuringPi can host which modules?', options: ['CM3 only','CM4 & Jetson','Pi 4 only'], answer: 'CM4 & Jetson', points: 2 },
+      { title: 'TRK1 uses which SoC?', options: ['Rockchip RK3588','Broadcom BCM2711','NVIDIA Tegra'], answer: 'Rockchip RK3588', points: 2 },
+      { title: 'Jetson Nano GPU architecture:', options: ['Maxwell','Pascal','Ampere'], answer: 'Maxwell', points: 2 },
+      { title: 'Orin NX AI throughput (TOPS):', options: ['10','50','100'], answer: '50', points: 2 },
+      { title: 'ClusterHAT connects Pi Zero via:', options: ['USB','Ethernet','SPI'], answer: 'USB', points: 2 },
+      // Monitoring (5)
+      { title: 'Prometheus default port:', options: ['9090','9100','8080'], answer: '9090', points: 2 },
+      { title: 'Grafana default port:', options: ['3000','4000','5000'], answer: '3000', points: 2 },
+      { title: 'PromQL is used for querying:', options: ['Metrics','Logs','Events'], answer: 'Metrics', points: 2 },
+      { title: 'Prometheus stores data in:', options: ['TSDB','InfluxDB','MySQL'], answer: 'TSDB', points: 2 },
+      { title: 'Grafana panel type:', options: ['Graph','Table','Stat'], answer: 'Graph', points: 2 }
     ];
 
-    // Render all questions
+    // Render questions
     const form = document.getElementById('quizForm');
     questions.forEach((q, idx) => {
-      const div = document.createElement('div'); div.className='question';
-      const p = document.createElement('p'); p.className='question-title';
-      p.textContent = `${idx+1}. ${q.title}`; div.appendChild(p);
-      const opts = document.createElement('div'); opts.className='options';
+      const div = document.createElement('div'); div.className = 'question';
+      const p = document.createElement('p'); p.className = 'question-title'; p.textContent = `${idx+1}. ${q.title}`;
+      div.appendChild(p);
+      const opts = document.createElement('div'); opts.className = 'options';
       q.options.forEach(opt => {
         const label = document.createElement('label');
-        const inp = document.createElement('input'); inp.type='radio'; inp.name=`q${idx}`; inp.value=opt;
-        label.appendChild(inp); label.append(opt); opts.appendChild(label); opts.appendChild(document.createElement('br'));
+        const inp = document.createElement('input'); inp.type = 'radio'; inp.name = `q${idx}`; inp.value = opt;
+        label.appendChild(inp); label.appendChild(document.createTextNode(' ' + opt)); opts.appendChild(label); opts.appendChild(document.createElement('br'));
       });
       div.appendChild(opts);
       form.appendChild(div);
@@ -52,7 +93,8 @@
         const sel = document.querySelector(`input[name="q${idx}"]:checked`);
         if (sel && sel.value === q.answer) score += q.points;
       });
-      document.getElementById('finalScore').textContent = `Your Score: ${score} / ${questions.length * 2}`;
+      const total = questions.reduce((sum, q) => sum + q.points, 0);
+      document.getElementById('finalScore').textContent = `Your Score: ${score} / ${total}`;
     }
   </script>
 </body>
